@@ -1,0 +1,1 @@
+g++ -fexec-charset=big5 -o HW_1.exe *.cpp

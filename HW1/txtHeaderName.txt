@@ -1,0 +1,5 @@
+lena512GrayLevel.txt
+lenaFirstTransformationGrayLevel.txt
+lenaSecondTransformationGrayLevel.txt
+lenaFirstRestorationGrayLevel.txt
+lenaSecondRestorationGrayLevel.txt

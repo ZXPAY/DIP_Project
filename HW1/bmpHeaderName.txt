@@ -1,0 +1,5 @@
+lena512.bmp
+lenaFirstTransformation.bmp
+lenaSecondTransformation.bmp
+lenaFirstRestoration.bmp
+lenaSecondRestoration.bmp
