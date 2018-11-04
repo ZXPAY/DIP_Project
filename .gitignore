@@ -1,0 +1,13 @@
+
+# 忽略.doc、ptt檔
+*.doc
+*.docx
+*.pptx
+*.ppt
+
+*.tmp
+
+
+*.exe
+*.o
+*.a

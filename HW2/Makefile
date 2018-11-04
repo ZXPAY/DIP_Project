@@ -1,13 +1,12 @@
-CC = g++  # 使用的編譯器
+CC = gcc  # 使用的編譯器
 RM := rm -rf
 
-LIBSRC = $(wildcard lib/*.cpp)
-SRC = $(wildcard ./*.cpp)
-LIBOBJS = $(patsubst %.cpp,%.o,$(LIBSRC))
-LIBOBJS += $(patsubst %.cpp,%.o,$(SRC))
+LIBSRC = $(wildcard lib/*.c)
+SRC = $(wildcard ./*.c)
+LIBOBJS = $(patsubst %.c,%.o,$(LIBSRC))
+LIBOBJS += $(patsubst %.c,%.o,$(SRC))
 INC = ./lib/
 
-ExecuteName := HW_1.exe
 # OBJ_LIB += \
 # ../HW_1.cpp\
 # ../lib/*.cpp\
@@ -25,4 +24,4 @@ CFLAGS := -o
 	$(CC) -c $< -o $@ -I $(INC)
 
 clean:
-	$(RM) -f *.o
+	$(RM) -f *.o main.exe
