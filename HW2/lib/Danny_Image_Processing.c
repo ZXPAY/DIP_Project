@@ -39,19 +39,30 @@ void DCT_transformUnit(uint8_t *originImage, double *img, uint16_t imgW, uint16_
       for(int x=0;x<8;x++){
         for(int y=0;y<8;y++){
           tempData = ((double)(originImage[(x+startX)*imgW+y+startY]))-128;
-          sum_tempData += (double)((tempData)*cos((double)((2*x+1)*(u)*pi)/16.0)*cos((double)(((2*y+1)*v*pi))/16.0));
+          sum_tempData += (double)((tempData)*cos((double)((2*x+1)*(u)*pi)/16.0)*cos((double)(((2*(y)+1)*v*pi))/16.0));
         }
       }
       double c_u = 1.0, c_v = 1.0;
       if(u == 0) c_u = 1/(sqrt(2));
       if(v == 0) c_v = 1/(sqrt(2));
       sum_tempData *= 0.25*c_u*c_v;
-      img[(u+startX)*imgW+v+startY] = sum_tempData/QuantizationMatrix[u][v];
+      img[(u+startX)*imgW+v+startY] = sum_tempData;
       // img[(u+startX)*imgW+v+startY] = sum_tempData/QuantizationMatrix[u][v]*FilterMask[u][v];
     }
   }
 }
 
+void Quantization_transform(double *img, uint16_t imgW, uint16_t imgH){
+  for(int u=0;u<imgW;u+=8){
+    for(int v=0;v<imgH;v+=8){
+      for(int x=0;x<8;x++){
+        for(int y=0;y<8;y++){
+          img[(u+x)*imgW+v+y] /= QuantizationMatrix[x][y];
+        }
+      }
+    }
+  }
+}
 
 // ********************************************************************** //
 // ********************************************************************** //
@@ -65,6 +76,18 @@ double *iDCT_transform(double *img, uint16_t imgW, uint16_t imgH){
   return iMat;
 }
 
+void iQuantization_transform(double *img, uint16_t imgW, uint16_t imgH){
+  for(int x=0;x<imgW;x+=8){
+    for(int y=0;y<imgH;y+=8){
+        for(int u=0;u<8;u++){
+          for(int v=0;v<8;v++){
+            img[(u+x)*imgW+v+y] *= QuantizationMatrix[u][v];
+          }
+      }
+    }
+  }
+}
+
 void iDCT_transformUnit(double *img, double *inv_img, uint16_t imgW, uint16_t startX, uint16_t startY){
   double sum_tempData = 0;
   for(int x=0;x<8;x++){
@@ -75,11 +98,23 @@ void iDCT_transformUnit(double *img, double *inv_img, uint16_t imgW, uint16_t st
           double c_u = 1.0, c_v = 1.0;
           if(u == 0) c_u = 1/(sqrt(2));
           if(v == 0) c_v = 1/(sqrt(2));
-          sum_tempData += c_u*c_v*img[(u+startX)*imgW+v+startY]*QuantizationMatrix[u][v]*cos((double)((2.0*x+1)*u*pi/16))*cos((double)((2.0*y+1)*v*pi/16));
+          sum_tempData += c_u*c_v*img[(u+startX)*imgW+v+startY]*cos((double)((2.0*x+1)*u*pi/16))*cos((double)((2.0*y+1)*v*pi/16));
         }
       }
       sum_tempData *= 0.25;
       inv_img[(x+startX)*imgW+y+startY] = sum_tempData + 128;
+    }
+  }
+}
+
+void filterMask_transform(double *img, uint16_t imgW, uint16_t imgH){
+  for(int u=0;u<imgW;u+=8){
+    for(int v=0;v<imgH;v+=8){
+      for(int x=0;x<8;x++){
+        for(int y=0;y<8;y++){
+          img[(u+x)*imgW+v+y] *= FilterMask[x][y];
+        }
+      }
     }
   }
 }
@@ -141,4 +176,27 @@ double *imgDownSampling(uint8_t *originImage, uint16_t imgW, uint16_t imgH){
   }
   // printf("nn->%lu\n", newC);
   return dimg;
+}
+
+double getImageMSE(uint8_t *originImage, double *transferedImage, uint32_t imgSize){
+  double sumError = 0;
+  double *rawImage = (double *)imgUint82Double(originImage, imgSize);
+  setDataNormalization(rawImage, imgSize);
+  double *newImage = (double *)malloc(imgSize*sizeof(double));
+  for(uint32_t i=0;i<imgSize;i++) newImage[i] = transferedImage[i];
+  setDataNormalization(newImage, imgSize);
+
+  for(uint32_t i=0;i<imgSize;i++){
+    sumError += pow((((double)rawImage[i]) - newImage[i]), 2.0);
+    // printf("%.2f\n", (((double)rawImage[i]) - newImage[i]));
+  }
+
+  free(rawImage);
+  free(newImage);
+  return sumError/((double)imgSize);
+}
+
+double getImagePSNR(uint8_t *originImage, double *transferedImage, uint32_t imgSize){
+  double imgMSE = getImageMSE(originImage, transferedImage, imgSize);
+  return 10 * (log10(255.0*255.0/imgMSE));
 }

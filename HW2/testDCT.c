@@ -27,12 +27,20 @@ void testDCT_Transform(){
   }
 
   double *img = DCT_transform(raw_img, 8, 8);
+  Quantization_transform(img, 8, 8);
   printf("\n\n====== DCT & Quantization ======\n");
   printTestMatrix(img);
 
+  iQuantization_transform(img, 8, 8);
   double *inv_img = iDCT_transform(img, 8, 8);
   printf("\n\n====== iQuantization & iDCT ======\n");
   printTestMatrix(inv_img);
+
+  double *imgd = DCT_transform(raw_img, 8, 8);
+  filterMask_transform(imgd, 8, 8);
+  printf("\n\n====== DCT & FilterMask ======\n");
+  printTestMatrix(imgd);
+
 }
 
 
