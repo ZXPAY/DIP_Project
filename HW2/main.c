@@ -21,6 +21,7 @@
 #define RUN_MAIN_1
 #define RUN_MAIN_2
 #define GENERATE_DCT_IMG
+#define GENERATE_DOWN_SAMPLING_MEAN
 
 #define IMG_NAME "lena512.bmp"
 #define pi (3.14159265358979323846264338327950288)
@@ -139,6 +140,15 @@ int main(){
   free(imgd);
   free(inv_imgd);
 #endif
+
+#ifdef GENERATE_DOWN_SAMPLING_MEAN
+  double *imgd_mean = imgDownSamplingMean(raw_img, 512, 512);
+  imageBmpWrite((char *)"HW2-2-1_UsingMean.bmp", &bmp, imgDouble2Uint8(imgd_mean, imgSize));
+  printf("mean PSNR : %.2f dB\n", getImagePSNR(raw_imgd, imgd_mean, imgSize));
+  free(imgd_mean);
+#endif
+
   printf("========== END ==========\n");
+  system("pause");
   return 0;
 }
