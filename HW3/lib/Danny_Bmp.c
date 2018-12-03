@@ -3,21 +3,84 @@
 uint8_t* imageBmpRead(char *fileName, bmpheader *bmp){
   FILE* f_r = fopen(fileName, "rb");
   fread(bmp, sizeof(uint8_t), (BMP_HEADRER_SIZE+BMP_PLATTE_SIZE), f_r);
-  uint32_t fileSize = getMatrixData(bmp->FileSize, sizeof(bmp->FileSize));
   setMatrixData(bmp->BitmapDataSize, 4, getMatrixData(bmp->Width, sizeof(bmp->Width))*getMatrixData(bmp->Height, sizeof(bmp->Height)));
-  uint8_t *img_data = (uint8_t *) malloc(fileSize*(sizeof(uint8_t)));
-  fread(img_data, sizeof(uint8_t), fileSize, f_r);
+  uint8_t *img_data = (uint8_t *) malloc(getMatrixData(bmp->BitmapDataSize, 4)*(sizeof(uint8_t)));
+  fread(img_data, sizeof(uint8_t), getMatrixData(bmp->BitmapDataSize, 4), f_r);
   fclose(f_r);
   return img_data;
 }
 
 void imageBmpWrite(char *fileName, bmpheader *bmp, uint8_t* img_data){
+  for(int i=0;i<256;i++){
+      bmp->Plalette[i*4+0] = i;
+      bmp->Plalette[i*4+1] = i;
+      bmp->Plalette[i*4+2] = i;
+      bmp->Plalette[i*4+3] = 0;
+  }
+  setMatrixData(bmp->BitsPerPixel, 4, 8);
+  setMatrixData(bmp->UsedColorsSize, 4, 256);
+  setMatrixData(bmp->BitmapDataOffset, 4, 1078);   // 1024 + 54
+
   FILE* f_w = fopen((char *)fileName, "wb");
   if(f_w == 0) printf("Error open !!!\n");
   uint32_t fileSize = getMatrixData(bmp->BitmapDataSize, sizeof(bmp->BitmapDataSize));
   fwrite(bmp, sizeof(uint8_t), (BMP_HEADRER_SIZE+BMP_PLATTE_SIZE), f_w);
   fwrite(img_data, sizeof(uint8_t), fileSize, f_w);
   fclose(f_w);
+}
+
+uint8_t** imageBmpReadBGR(char *fileName, bmpheader *bmp){
+  FILE* f_r = fopen((char *)fileName, "rb");
+  if(f_r == 0) printf("Error open !!!\n");
+  fread(bmp, sizeof(uint8_t), (BMP_HEADRER_SIZE), f_r);
+  setMatrixData(bmp->BitmapDataSize, 4, getMatrixData(bmp->Width, sizeof(bmp->Width))*getMatrixData(bmp->Height, sizeof(bmp->Height)));
+  uint8_t *img_data = (uint8_t *) malloc(getMatrixData(bmp->BitmapDataSize, 4)*3*(sizeof(uint8_t)));
+  fread(img_data, sizeof(uint8_t), getMatrixData(bmp->BitmapDataSize, 4)*3, f_r);
+  fclose(f_r);
+
+  uint8_t *r = (uint8_t *)malloc(getMatrixData(bmp->BitmapDataSize, 4)*sizeof(uint8_t));
+  uint8_t *g = (uint8_t *)malloc(getMatrixData(bmp->BitmapDataSize, 4)*sizeof(uint8_t));
+  uint8_t *b = (uint8_t *)malloc(getMatrixData(bmp->BitmapDataSize, 4)*sizeof(uint8_t));
+
+  uint16_t rawImgW = getMatrixData(bmp->Width, sizeof(bmp->Width));
+  uint16_t rawImgH = getMatrixData(bmp->Height, sizeof(bmp->Height));
+  for(uint16_t w=0;w<rawImgW;w++){
+    for(uint16_t h=0;h<rawImgH;h++){
+      b[w+h*rawImgW] = img_data[3*(w+h*rawImgW)+0];
+      g[w+h*rawImgW] = img_data[3*(w+h*rawImgW)+1];
+      r[w+h*rawImgW] = img_data[3*(w+h*rawImgW)+2];
+    }
+  }
+  uint8_t **imgBGR = (uint8_t **)malloc(3);
+  imgBGR[0] = b;
+  imgBGR[1] = g;
+  imgBGR[2] = r;
+  return imgBGR;
+}
+
+void imageBmpWriteBGR(char *fileName, bmpheader *bmp, uint8_t** img_data){
+  setMatrixData(bmp->BitsPerPixel, 4, 24);
+  setMatrixData(bmp->UsedColorsSize, 4, 0);
+  setMatrixData(bmp->BitmapDataOffset, 4, 54);
+  uint8_t* temp = (uint8_t *)malloc(getMatrixData(bmp->BitmapDataSize, 4)*3*sizeof(uint8_t));
+  uint8_t* b = img_data[0];
+  uint8_t* g = img_data[1];
+  uint8_t* r = img_data[2];
+  uint16_t imgW = getMatrixData(bmp->Width, 4);
+  uint16_t imgH = getMatrixData(bmp->Height, 4);
+  for(uint16_t w=0;w<imgW;w++){
+    for(uint16_t h=0;h<imgH;h++){
+      temp[3*(w+h*imgW)+0] = b[w+h*imgW];
+      temp[3*(w+h*imgW)+1] = g[w+h*imgW];
+      temp[3*(w+h*imgW)+2] = r[w+h*imgW];
+    }
+  }
+  FILE* f_w = fopen((char *)fileName, "wb");
+  if(f_w == 0) printf("Error open !!!\n");
+  fwrite(bmp, sizeof(uint8_t), (BMP_HEADRER_SIZE), f_w);
+  fwrite(temp, sizeof(uint8_t), imgW*imgH*3, f_w);
+  fclose(f_w);
+  free(temp);
 }
 
 // Calculate Bitmap File information

@@ -7,7 +7,7 @@
 
 *.tmp
 
-
+test*.bmp
 *.exe
 *.o
 *.a

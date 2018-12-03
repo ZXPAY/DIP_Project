@@ -3,7 +3,8 @@
 uint8_t* imageBmpRead(char *fileName, bmpheader *bmp){
   FILE* f_r = fopen(fileName, "rb");
   fread(bmp, sizeof(uint8_t), (BMP_HEADRER_SIZE+BMP_PLATTE_SIZE), f_r);
-  uint32_t fileSize = getMatrixData(bmp->BitmapDataSize, sizeof(bmp->BitmapDataSize));
+  uint32_t fileSize = getMatrixData(bmp->FileSize, sizeof(bmp->FileSize));
+  setMatrixData(bmp->BitmapDataSize, 4, getMatrixData(bmp->Width, sizeof(bmp->Width))*getMatrixData(bmp->Height, sizeof(bmp->Height)));
   uint8_t *img_data = (uint8_t *) malloc(fileSize*(sizeof(uint8_t)));
   fread(img_data, sizeof(uint8_t), fileSize, f_r);
   fclose(f_r);
@@ -32,7 +33,6 @@ uint32_t getMatrixData(uint8_t *mat, uint8_t mat_size){
 }
 
 void setMatrixData(uint8_t *mat, uint8_t mat_size, uint32_t data){
-  uint32_t tempData = data;
   for(int i=0;i<mat_size;i++){
     mat[i] = ((data&(0xff<<(8*i)))>>(8*i));
   }

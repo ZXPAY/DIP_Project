@@ -13,7 +13,6 @@
   |
   |
   |------------> v
-
 */
 
 // #define SHOW_BMP_HEADER_INFORATION
@@ -23,7 +22,7 @@
 #define GENERATE_DCT_IMG
 #define GENERATE_DOWN_SAMPLING_MEAN
 
-#define IMG_NAME "lena512.bmp"
+#define IMG_NAME "Baboon.bmp"
 #define pi (3.14159265358979323846264338327950288)
 
 int main(){
@@ -74,10 +73,10 @@ int main(){
 // #### Image subsract #### //
   double *img_substract = (double *)malloc(imgSize*sizeof(double));
   for(uint32_t i=0;i<imgSize;i++){
-    img_substract[i] =  inv_img[i] - (double)raw_img[i];
+    img_substract[i] =  abs(inv_img[i] - (double)raw_img[i]);
   }
   printf("img_substract %.15f, %.15f\n", getMaximum(img_substract, imgSize), getMinimum(img_substract, imgSize));
-  setDataNormalization(img_substract, imgSize);
+  // setDataNormalization(img_substract, imgSize);
   printf("2-1-3 MSE  : %.2f\n", getImageMSE(raw_img, img_substract, imgSize));
   printf("2-1-3 PSNR : %.2f dB\n", getImagePSNR(raw_img, img_substract, imgSize));
 #ifdef GENERATE_DCT_IMG
@@ -96,7 +95,7 @@ int main(){
   double *imgDown = imgDownSampling(raw_img, imgWidth, imgHeight);
   setMatrixData(bmp.Width, 4, 256);
   setMatrixData(bmp.Height, 4, 256);
-  setMatrixData(bmp.FileSize, 4, 256*256+56+256*4);
+  setMatrixData(bmp.FileSize, 4, 256*256+52+256*4);
   setMatrixData(bmp.BitmapDataSize, 4, 256*256);
   imgSize = getMatrixData(bmp.BitmapDataSize, 4);
   imgWidth = getMatrixData(bmp.Width, 4);
