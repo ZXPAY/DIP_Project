@@ -120,17 +120,14 @@ void showBmpHeaderInformation(bmpheader *bmp){
   printf("ImportantColors is : %d\n", getMatrixData(bmp->ImportantColors, sizeof(bmp->ImportantColors)));
 }
 
-void setGrayLevelHistogramData(bmpheader* bmp, uint8_t* img_data, uint32_t* GrayLevelData){
-  uint16_t widthSize = getMatrixData(bmp->Width, sizeof(bmp->Width));
-  uint16_t HeightSize = getMatrixData(bmp->Height, sizeof(bmp->Height));
-  for(int i=0;i<256;i++){
-    *(GrayLevelData+i) = 0;
-  }
-  for(int w=0;w<widthSize;w++){
-    for(int h=0;h<HeightSize;h++){
-      (*(GrayLevelData+*(img_data+h+w*(widthSize))))++;
+uint32_t *getGrayLevelHistogramData(double* img_data, uint16_t imgW, uint16_t imgH){
+  uint32_t *grayLevelData = (uint32_t *)calloc(256, sizeof(uint32_t));
+  for(int w=0;w<imgW;w++){
+    for(int h=0;h<imgH;h++){
+      grayLevelData[(uint8_t)img_data[w+h*(imgW)]]++;
     }
   }
+  return grayLevelData;
 }
 
 // ===================================================== //

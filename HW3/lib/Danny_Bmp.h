@@ -35,7 +35,7 @@ void imageBmpWriteBGR(char *fileName, bmpheader *bmp, uint8_t** img_data);
 uint32_t getMatrixData(uint8_t* mat, uint8_t mat_size);
 void setMatrixData(uint8_t *mat, uint8_t mat_size, uint32_t data);
 void showBmpHeaderInformation(bmpheader *bmp);
-void setGrayLevelHistogramData(bmpheader* bmp, uint8_t* img_array, uint32_t* GrayLevelData);
+uint32_t *getGrayLevelHistogramData(double* img_data, uint16_t imgW, uint16_t imgH);
 
 // Normalization
 double getMinimum(double *mptr, uint32_t dataSize);

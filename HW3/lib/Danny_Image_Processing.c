@@ -533,6 +533,67 @@ double* closing(double *img, uint16_t imgW, uint16_t imgH, uint8_t *mask, uint8_
   return dilationErosionImg;
 }
 
+double *connectedComponentLabling(double *img, uint16_t imgW, uint16_t imgH, double backgroundValue){
+  // Using four neighbors method to mark the area
+  double *marker = (double *)calloc(imgW*imgH, sizeof(double)); // initial value is 0
+  double sortedValue[8] = {0,0,0,0,0,0,0,0};
+  uint16_t labelValue = 0;
+  double *sortedMat;
+  double value;
+
+  for(uint16_t w=1;w<imgW-1;w++){
+    for(uint16_t h=1;h<imgH-1;h++){
+      if(img[w+h*imgW] != backgroundValue){
+        sortedValue[0] = marker[w-1+(h-1)*imgW];
+        sortedValue[1] = marker[w-1+(h)*imgW];
+        sortedValue[2] = marker[w-1+(h+1)*imgW];
+        sortedValue[3] = marker[w+(h-1)*imgW];
+        sortedValue[4] = marker[w+(h+1)*imgW];
+        sortedValue[5] = marker[w+1+(h-1)*imgW];
+        sortedValue[6] = marker[w+1+(h)*imgW];
+        sortedValue[7] = marker[w+1+(h+1)*imgW];
+        sortedMat = sortedMatrix(&sortedValue[0], 8, false);
+        double value = 0;
+        for(int i=1;i<8;i++) if(sortedMat[i]!=0){value=sortedMat[i];break;}
+        if(value != 0){
+          marker[w+h*imgW] = value;
+        }
+        else{
+          labelValue++;
+          marker[w+h*imgW] = labelValue;
+        }
+        free(sortedMat);
+      }
+    }
+  }
+
+  for(uint16_t k=0;k<(100);k++){
+    for(uint16_t w=1;w<imgW-1;w++){
+      for(uint16_t h=1;h<imgH-1;h++){
+        if(img[w+h*imgW] != backgroundValue){
+          sortedValue[0] = marker[w-1+(h-1)*imgW];
+          sortedValue[1] = marker[w-1+(h)*imgW];
+          sortedValue[2] = marker[w-1+(h+1)*imgW];
+          sortedValue[3] = marker[w+(h-1)*imgW];
+          sortedValue[4] = marker[w+(h+1)*imgW];
+          sortedValue[5] = marker[w+1+(h-1)*imgW];
+          sortedValue[6] = marker[w+1+(h)*imgW];
+          sortedValue[7] = marker[w+1+(h+1)*imgW];
+          sortedMat = sortedMatrix(&sortedValue[0], 8, false);
+          value = 0;
+          for(int i=1;i<8;i++) if(sortedMat[i]!=0){value=sortedMat[i];break;}
+          if(value != 0){
+            marker[w+h*imgW] = value;
+          }
+          free(sortedMat);
+        }
+      }
+    }
+}
+  return marker;
+}
+
+
 void swap(double *value1, double *value2){
   double tempData = *value1;
   *value1 = *value2;

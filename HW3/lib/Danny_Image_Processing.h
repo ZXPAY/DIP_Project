@@ -85,6 +85,9 @@ double* erosion(double *img, uint16_t imgW, uint16_t imgH, uint8_t *mask, uint8_
 double* opening(double *img, uint16_t imgW, uint16_t imgH, uint8_t *mask, uint8_t maskW, uint8_t maskH);
 double* closing(double *img, uint16_t imgW, uint16_t imgH, uint8_t *mask, uint8_t maskW, uint8_t maskH);
 
+// four connected component labeling method
+double *connectedComponentLabling(double *img, uint16_t imgW, uint16_t imgH, double backgroundValue);
+
 // Call by address, exchange two value
 void swap(double *value1, double *value2);
 
