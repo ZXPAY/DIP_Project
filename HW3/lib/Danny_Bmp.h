@@ -43,4 +43,7 @@ double getMaximum(double *mptr, uint32_t dataSize);
 void setDataNormalization(double *ptr, uint32_t dataSize);
 void testNormalization();
 
+bool isValueInMatrix(uint8_t *mat, double value, uint32_t dataSize);
+uint8_t *getDifferentGray(double *grayImg, uint32_t dataSize);
+
 #endif

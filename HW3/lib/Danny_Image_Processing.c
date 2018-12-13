@@ -540,6 +540,7 @@ double *connectedComponentLabling(double *img, uint16_t imgW, uint16_t imgH, dou
   uint16_t labelValue = 0;
   double *sortedMat;
   double value;
+  uint32_t imgSize = imgW*imgH;
 
   for(uint16_t w=1;w<imgW-1;w++){
     for(uint16_t h=1;h<imgH-1;h++){
@@ -567,7 +568,7 @@ double *connectedComponentLabling(double *img, uint16_t imgW, uint16_t imgH, dou
     }
   }
 
-  for(uint16_t k=0;k<(100);k++){
+  for(uint16_t k=0;k<(300);k++){
     for(uint16_t w=1;w<imgW-1;w++){
       for(uint16_t h=1;h<imgH-1;h++){
         if(img[w+h*imgW] != backgroundValue){
@@ -589,7 +590,31 @@ double *connectedComponentLabling(double *img, uint16_t imgW, uint16_t imgH, dou
         }
       }
     }
-}
+  }
+
+  uint8_t *haveValue = (uint8_t *)calloc(256, sizeof(uint8_t));
+    uint8_t cnt = 0;
+    for(uint32_t i=0;i<imgSize;i++){
+      if(marker[i] != 0){
+        bool flag = false;
+        for(uint8_t j=0;j<cnt+1;j++){
+          if((uint8_t)marker[i] == haveValue[j]){
+            flag = true;
+          }
+        }
+        if(!flag){
+          haveValue[cnt] = (uint8_t)marker[i];
+          cnt++;
+        }
+        uint8_t cnt2 = 0;
+        while((uint8_t)marker[i] != haveValue[cnt2]){
+          cnt2++;
+        }
+        marker[i] = cnt2+1;
+      }
+  }
+
+  free(haveValue);
   return marker;
 }
 

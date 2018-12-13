@@ -168,3 +168,27 @@ void testNormalization(){
     printf("test : %.3f,  ans : %.3f\n", ptr[i], ans[i]);
   }
 }
+
+bool isValueInMatrix(uint8_t *mat, double value, uint32_t dataSize){
+  bool isInMatrix = false;
+  for(uint8_t i=0;i<=dataSize;i++){
+    if(mat[i]==(uint8_t)value){
+      isInMatrix = true;
+    }
+  }
+  return isInMatrix;
+}
+
+uint8_t *getDifferentGray(double *grayImg, uint32_t dataSize){
+  uint8_t cnt = 0;
+  uint8_t *haveNum = (uint8_t *) calloc(255, sizeof(uint8_t));
+  for(uint8_t p=0;p<=255;p++){
+    if(grayImg[p]!=0){
+      // if(!isValueInMatrix(haveNum, grayImg[p], cnt+1)){
+      //   haveNum[cnt] = grayImg[p];
+      // }
+      printf("EFEF\n");
+    }
+  }
+  return haveNum;
+}
