@@ -26,7 +26,7 @@ uint8_t mMask2[3][3] = {
 // #define RUN_TEST
 #define RUN_MAIN_1
 // #define RUN_MAIN_2
-// #define MAIN_GENERATE_IMAGE
+#define MAIN_GENERATE_IMAGE
 // #define RUN_TEST_CONNECTED
 
 int main(){
